@@ -1,0 +1,109 @@
+---
+driver:
+  name: ec2
+  aws_ssh_key_id: ChefKeypair
+  region: us-east-1
+  availability_zone: a
+  subnet_id: *snip*
+  instance_type: t2.micro
+  image_id: *snip*
+  security_group_ids: ["*snip*"]
+  retryable_tries: 120
+  associate_public_ip: true
+  interface: dns
+
+provisioner:
+  name: chef_zero
+
+verifier:
+  name: inspec
+
+platforms:
+  - name: centos-7
+
+transport:
+  ssh_key: ChefKeypair.pem
+  username: centos
+  connection_timeout: 10
+  connection_retries: 5
+
+suites:
+  - name: core
+    provisioner:
+      named_run_list: core
+    verifier:                      
+      inspec_tests:                 
+        - test/integration/default   
+    attributes:
+    tags:
+      Name: 'Game-Core'
+
+  - name: web_front
+    provisioner:
+      named_run_list: web_front
+    verifier:
+      inspec_tests:
+        - test/integration/default
+    attributes:
+    tags:
+      Name: 'Game-Frontend'
+
+  - name: web_back
+    provisioner:
+      named_run_list: web_back
+    verifier:
+      inspec_tests:
+        - test/integration/default
+    attributes:
+    tags:
+      Name: 'Game-Backend'
+
+  - name: db
+    provisioner:
+      named_run_list: db
+    verifier:
+      inspec_tests:
+        - test/integration/default
+    attributes:
+    tags:
+      Name: 'Game-DB'
+
+  - name: micropayment
+    provisioner:
+      named_run_list: micropayment
+    verifier:
+      inspec_tests:
+        - test/integration/default
+    attributes:
+    tags:
+      Name: 'Game-Micropayment'
+
+  - name: coop_core
+    provisioner:
+      named_run_list: coop_core
+    verifier:
+      inspec_tests:
+        - test/integration/default
+    attributes:
+    tags:
+      Name: 'Coop-Core'
+
+  - name: coop_gateway
+    provisioner:
+      named_run_list: coop_gateway
+    verifier:
+      inspec_tests:
+        - test/integration/default
+    attributes:
+    tags:
+      Name: 'Coop-Gateway'
+
+  - name: coop_env
+    provisioner:
+      named_run_list: coop_env
+    verifier:
+      inspec_tests:
+        - test/integration/default
+    attributes:
+    tags:
+      Name: 'Coop-Env'
